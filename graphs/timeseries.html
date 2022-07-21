@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>dc.js - Switching Time Intervals</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/dc.css"/>
+    <style>
+      dl {
+        margin-left: 2em;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      
+      <select name="select-location" id="select-contam">
+		<option value="-1">Seleccione contaminante:</option>
+		<!--<option value="cancer_deaths.geojson">Cáncer</option>-->
+		<option value="medicionesTotales.geojson">PM10</option>	
+		<option value="medicionesTotales.geojson">PM2.5</option>
+        <option value="medicionesMonth_short.json">Month_short</option>
+        				
+	</select>
+   
+    <select id="interval"></select>
+      <span style="font-size: large" id="counter"></span><span id="counter-text" style="display: none"> seleccionados.</span>
+      <br>
+      <div id="test" style="min-height: 500px"></div>
+      <div style="clear: both">        
+      </div>
+      <div id="test2" style="min-height: 500px"></div>
+      <div style="clear: both">        
+      </div>
+
+      <script type="text/javascript" src="js/d3.js"></script>
+      <script type="text/javascript" src="js/crossfilter.js"></script>
+      <script type="text/javascript" src="js/dc.js"></script>
+      <script type="text/javascript">
+        
+        //d3.select("#select-contam").text("first");
+
+        d3.select("select").on("change",function(d){
+            const selected = "'"+d3.select("#select-contam").node().value+",";
+            console.log( selected );
+            //d3.select("#select-contam").text(selected);
+        })
+    </script>
+     
+     <script type="text/javascript">
+
+var find_query = function() {
+            var _map = window.location.search.substr(1).split('&').map(function(a) {
+                return a.split('=');
+            }).reduce(function(p, v) {
+                if(v.length > 1)
+                    p[v[0]] = decodeURIComponent(v[1].replace(/\+/g, " "));
+                else
+                    p[v[0]] = true;
+                return p;
+            }, {});
+            return function(field) {
+                return _map[field] || null;
+            };
+        }();
+        var selected; 
+        d3.select("select").on("change",function(d){ // select on change
+            selected ='json/'+ d3.select("#select-contam").node().value.toString();
+            console.log( selected );
+
+            var data = find_query('data') || selected,
+            date_col = find_query('date') || 'fecha',
+            val_col = find_query('val') || 'AvgMedicion',
+            aggregate = find_query('aggregate') || 'average';
+
+        var chart = new dc.BarChart("#test"), counter = new dc.NumberDisplay('#counter');
+        var lineChart = new dc.LineChart("#test2");
+        d3.json(data).then(function(posts) {
+            posts.forEach(function(d) {
+                d[date_col] = new Date(d[date_col]);
+                d[val_col] = +d[val_col];
+            });
+            console.log(posts);
+            var ndx = crossfilter(posts),
+                dateDim = ndx.dimension(function(d) { return d[date_col]; }),
+                postsGroup;
+
+            var intervals = {
+                Días: d3.timeDay,
+                Semanas: d3.timeWeek,
+                Meses: d3.timeMonth,
+                Años: d3.timeYear
+            };
+            var defint = find_query('interval') || 'Años';
+            d3.select('#interval').selectAll('option')
+                .data(Object.keys(intervals))
+              .enter().append('option')
+                .text(function(d) { return d; })
+                .attr('selected', function(d) { return d === defint ? '' : null; });
+
+            function setup() {
+                var start_t = window.performance.now();
+                if(postsGroup)
+                    postsGroup.dispose();
+                var interval_name = d3.select('#interval').nodes()[0].value;
+                var interval = intervals[interval_name];
+                chart.xUnits(interval.range);
+                lineChart.xUnits(interval.range);
+                postsGroup = dateDim
+                    .group(function(k) { return interval(k); })
+                    .reduce(
+                        function(p, v) {
+                            ++p.count;
+                            p.total += v[val_col];
+                            return p;
+                        },
+                        function(p, v) {
+                            --p.count;
+                            p.total -= v[val_col];
+                            return p;
+                        },
+                        function() {
+                            return {
+                                count: 0,
+                                total: 0
+                            };
+                        }
+                    );
+                switch(aggregate) {
+                case 'average':
+                    chart.valueAccessor(function(kv) {
+                        return kv.value.total / kv.value.count;
+                    });
+                    lineChart.valueAccessor(function(kv) {
+                        return kv.value.total / kv.value.count;
+                    });
+                    break;                    
+                    
+                case 'total':
+                default:
+                    chart.valueAccessor(function(kv) {
+                        return kv.value.total;
+                    });
+                    lineChart.valueAccessor(function(kv) {
+                        return kv.value.total;
+                    });
+                }
+                chart.dimension(dateDim).group(postsGroup)
+                    .transitionDuration(!find_query('unsafe') && postsGroup.all().length > 2000 ? 0 : 1000)
+                    .render();
+                lineChart.dimension(dateDim).group(postsGroup)
+                    .transitionDuration(!find_query('unsafe') && postsGroup.all().length > 2000 ? 0 : 1000)
+                    .render();
+                console.log(['setup for', interval_name, 'took', window.performance.now() - start_t, 'ms'].join(' '));
+            }
+
+            chart
+                .width(768)
+                .height(480)
+                .x(d3.scaleTime())
+                .xUnits(d3.timeWeeks)
+                .margins({left: 50, top: 0, right: 0, bottom: 20})
+                .elasticY(true)
+                .clipPadding(10);
+            chart.yAxis().tickFormat(d3.format('.3s'));
+
+            lineChart.width(960)
+                .height(150)
+                .margins({top: 10, right: 10, bottom: 20, left: 40})   
+                .transitionDuration(500)
+                .elasticY(true)    
+                .xAxis();
+
+            // this demonstrates solving elasticX manually, avoiding the
+            // bug where the rightmost bar/box is not displayed, #792
+            function calc_domain(chart) {
+                var min = d3.min(chart.group().all(), function(kv) { return kv.key; }),
+                    max = d3.max(chart.group().all(), function(kv) { return kv.key; });
+                max = d3.timeMonth.offset(max, 1);
+                chart.x().domain([min, max]);
+                
+            }
+
+            function calc_domain2(lineChart) {
+                var min = d3.min(lineChart.group().all(), function(kv) { return kv.key; }),
+                    max = d3.max(lineChart.group().all(), function(kv) { return kv.key; });
+                max = d3.timeMonth.offset(max, 1);
+                lineChart.x(d3.scaleTime().domain([min, max]))
+                
+            }
+            chart.on('preRender', calc_domain);
+            chart.on('preRedraw', calc_domain);
+
+            lineChart.on('preRender', calc_domain2);
+            lineChart.on('preRedraw', calc_domain2);
+
+            var countAll = ndx.groupAll(),
+                groupAll = ndx.groupAll().reduceSum(function(d) { return d[val_col]; });
+            counter
+                .dimension({})
+                .group(groupAll);
+            switch(aggregate) {
+            case 'average':
+                counter.valueAccessor(function(x) {
+                    return x / countAll.value();
+                });
+                break;
+            case 'total':
+            default:
+                counter.valueAccessor(function(x) { return x; });
+            }
+            d3.select('#interval').on('change', function() {
+                setup();
+            });
+            counter.on('postRender', function () {
+                d3.select('#counter-text').style('display', 'inline');
+            });
+            setup();
+
+            dc.renderAll();
+
+        });
+            
+        }); // Fin select on change
+        
+
+        function print_filter(filter) {
+    var f=eval(filter);
+    if (typeof(f.length) != "undefined") {}else{}
+    if (typeof(f.top) != "undefined") {f=f.top(Infinity);}else{}
+    if (typeof(f.dimension) != "undefined") {f=f.dimension(function(d) { return "";}).top(Infinity);}else{}
+    console.log(filter+"("+f.length+") = "+JSON.stringify(f).replace("[","[\n\t").replace(/}\,/g,"},\n\t").replace("]","\n]"));
+  }
+      </script>
+
+    </div>
+  </body>
+</html>
