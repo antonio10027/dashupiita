@@ -1,0 +1,134 @@
+<html>
+<head>
+<style>
+#line-chart {
+display: block;
+width: 100%;
+}
+</style>
+<script src="../plugins/jquery/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/fontawesome.min.css">
+
+</head>
+<body>
+  <div style="max-width:100%; max-height:100px">
+    <canvas id="myChart" width="400" height="100"></canvas>
+    <p><a id="btnDownload" download="chart.png" href="">Descargar</a></p>
+  </div>
+
+
+<script>
+  let response = '{"stats":[ { "time":"2018-10-24 13:30:02", "occupation":"54", "liveness":"78", "efficiency":"48", "pms":"up" }, { "time":"2018-10-24 13:45:02", "occupation":"55", "liveness":"78", "efficiency":"50", "pms":"up" }, { "time":"2018-10-24 14:00:01", "occupation":"56", "liveness":"76", "efficiency":"51", "pms":"up" }, { "time":"2018-10-24 14:15:02", "occupation":"56", "liveness":"77", "efficiency":"52", "pms":"up" }, { "time":"2018-10-24 14:30:01", "occupation":"56", "liveness":"78", "efficiency":"53", "pms":"up" }, { "time":"2018-10-24 14:45:01", "occupation":"57", "liveness":"79", "efficiency":"56", "pms":"up" }, { "time":"2018-10-24 15:00:02", "occupation":"57", "liveness":"79", "efficiency":"56", "pms":"up" }]}';
+
+  let response2 = '{"stats":[{"date":"2007-01-31","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-02-28","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-03-31","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-04-30","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-05-31","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-06-30","id_station":"ACO","id_parameter":"O3","media":2.832919692993164e+001},{"date":"2007-07-31","id_station":"ACO","id_parameter":"O3","media":2.928796386718750e+001},{"date":"2007-08-31","id_station":"ACO","id_parameter":"O3","media":2.787956619262695e+001},{"date":"2007-09-30","id_station":"ACO","id_parameter":"O3","media":2.476166343688965e+001},{"date":"2007-10-31","id_station":"ACO","id_parameter":"O3","media":2.933985519409180e+001},{"date":"2007-11-30","id_station":"ACO","id_parameter":"O3","media":2.694296455383301e+001},{"date":"2007-12-31","id_station":"ACO","id_parameter":"O3","media":3.105922889709473e+001},{"date":"2008-01-31","id_station":"ACO","id_parameter":"O3","media":2.855628395080566e+001},{"date":"2008-02-29","id_station":"ACO","id_parameter":"O3","media":3.503600311279297e+001},{"date":"2008-03-31","id_station":"ACO","id_parameter":"O3","media":4.032415771484375e+001},{"date":"2008-04-30","id_station":"ACO","id_parameter":"O3","media":3.972247314453125e+001},{"date":"2008-05-31","id_station":"ACO","id_parameter":"O3","media":4.099765014648438e+001},{"date":"2008-06-30","id_station":"ACO","id_parameter":"O3","media":2.744316864013672e+001},{"date":"2008-07-31","id_station":"ACO","id_parameter":"O3","media":2.555607795715332e+001},{"date":"2008-08-31","id_station":"ACO","id_parameter":"O3","media":2.680910301208496e+001},{"date":"2008-09-30","id_station":"ACO","id_parameter":"O3","media":2.631457519531250e+001},{"date":"2008-10-31","id_station":"ACO","id_parameter":"O3","media":2.589487838745117e+001},{"date":"2008-11-30","id_station":"ACO","id_parameter":"O3","media":2.809378433227539e+001},{"date":"2008-12-31","id_station":"ACO","id_parameter":"O3","media":2.927645301818848e+001},{"date":"2009-01-31","id_station":"ACO","id_parameter":"O3","media":2.748860931396484e+001},{"date":"2009-02-28","id_station":"ACO","id_parameter":"O3","media":3.233702087402344e+001},{"date":"2009-03-31","id_station":"ACO","id_parameter":"O3","media":3.166953468322754e+001},{"date":"2009-04-30","id_station":"ACO","id_parameter":"O3","media":3.542766952514648e+001},{"date":"2009-05-31","id_station":"ACO","id_parameter":"O3","media":3.746419906616211e+001},{"date":"2009-06-30","id_station":"ACO","id_parameter":"O3","media":3.086234855651856e+001},{"date":"2009-07-31","id_station":"ACO","id_parameter":"O3","media":2.892396736145020e+001},{"date":"2009-08-31","id_station":"ACO","id_parameter":"O3","media":2.854131507873535e+001},{"date":"2009-09-30","id_station":"ACO","id_parameter":"O3","media":2.858942031860352e+001},{"date":"2009-10-31","id_station":"ACO","id_parameter":"O3","media":2.858942031860352e+001},{"date":"2009-11-30","id_station":"ACO","id_parameter":"O3","media":2.858942031860352e+001},{"date":"2009-12-31","id_station":"ACO","id_parameter":"O3","media":2.916783332824707e+001},{"date":"2010-01-31","id_station":"ACO","id_parameter":"O3","media":2.412143325805664e+001},{"date":"2010-02-28","id_station":"ACO","id_parameter":"O3","media":2.474027252197266e+001},{"date":"2010-03-31","id_station":"ACO","id_parameter":"O3","media":3.230005645751953e+001},{"date":"2010-04-30","id_station":"ACO","id_parameter":"O3","media":3.479285049438477e+001},{"date":"2010-05-31","id_station":"ACO","id_parameter":"O3","media":3.907001495361328e+001},{"date":"2010-06-30","id_station":"ACO","id_parameter":"O3","media":3.441802978515625e+001},{"date":"2010-07-31","id_station":"ACO","id_parameter":"O3","media":2.328657722473145e+001},{"date":"2010-08-31","id_station":"ACO","id_parameter":"O3","media":2.393278312683106e+001},{"date":"2010-09-30","id_station":"ACO","id_parameter":"O3","media":2.258711624145508e+001},{"date":"2010-10-31","id_station":"ACO","id_parameter":"O3","media":3.007089996337891e+001},{"date":"2010-11-30","id_station":"ACO","id_parameter":"O3","media":2.696975708007813e+001},{"date":"2010-12-31","id_station":"ACO","id_parameter":"O3","media":2.898632049560547e+001},{"date":"2011-01-31","id_station":"ACO","id_parameter":"O3","media":2.954004287719727e+001},{"date":"2011-02-28","id_station":"ACO","id_parameter":"O3","media":3.141180419921875e+001},{"date":"2011-03-31","id_station":"ACO","id_parameter":"O3","media":3.843185424804688e+001},{"date":"2011-04-30","id_station":"ACO","id_parameter":"O3","media":4.236743545532227e+001},{"date":"2011-05-31","id_station":"ACO","id_parameter":"O3","media":4.175687408447266e+001},{"date":"2011-06-30","id_station":"ACO","id_parameter":"O3","media":3.493085479736328e+001},{"date":"2011-07-31","id_station":"ACO","id_parameter":"O3","media":2.497102165222168e+001},{"date":"2011-08-31","id_station":"ACO","id_parameter":"O3","media":2.820237350463867e+001},{"date":"2011-09-30","id_station":"ACO","id_parameter":"O3","media":3.009227943420410e+001},{"date":"2011-10-31","id_station":"ACO","id_parameter":"O3","media":2.713682174682617e+001},{"date":"2011-11-30","id_station":"ACO","id_parameter":"O3","media":2.732818603515625e+001},{"date":"2011-12-31","id_station":"ACO","id_parameter":"O3","media":2.942978286743164e+001},{"date":"2012-01-31","id_station":"ACO","id_parameter":"O3","media":2.614150047302246e+001},{"date":"2012-02-29","id_station":"ACO","id_parameter":"O3","media":2.313371276855469e+001},{"date":"2012-03-31","id_station":"ACO","id_parameter":"O3","media":3.210332107543945e+001},{"date":"2012-04-30","id_station":"ACO","id_parameter":"O3","media":3.622655487060547e+001},{"date":"2012-05-31","id_station":"ACO","id_parameter":"O3","media":3.852831268310547e+001},{"date":"2012-06-30","id_station":"ACO","id_parameter":"O3","media":3.100611114501953e+001},{"date":"2012-07-31","id_station":"ACO","id_parameter":"O3","media":2.570778465270996e+001},{"date":"2012-08-31","id_station":"ACO","id_parameter":"O3","media":2.521062088012695e+001},{"date":"2012-09-30","id_station":"ACO","id_parameter":"O3","media":2.687939262390137e+001},{"date":"2012-10-31","id_station":"ACO","id_parameter":"O3","media":2.527308654785156e+001},{"date":"2012-11-30","id_station":"ACO","id_parameter":"O3","media":2.494274902343750e+001},{"date":"2012-12-31","id_station":"ACO","id_parameter":"O3","media":2.577638626098633e+001},{"date":"2013-01-31","id_station":"ACO","id_parameter":"O3","media":2.540530586242676e+001},{"date":"2013-02-28","id_station":"ACO","id_parameter":"O3","media":3.217205047607422e+001},{"date":"2013-03-31","id_station":"ACO","id_parameter":"O3","media":3.270449447631836e+001},{"date":"2013-04-30","id_station":"ACO","id_parameter":"O3","media":4.233890533447266e+001},{"date":"2013-05-31","id_station":"ACO","id_parameter":"O3","media":4.491489791870117e+001},{"date":"2013-06-30","id_station":"ACO","id_parameter":"O3","media":3.165279769897461e+001},{"date":"2013-07-31","id_station":"ACO","id_parameter":"O3","media":3.043655014038086e+001},{"date":"2013-08-31","id_station":"ACO","id_parameter":"O3","media":3.043698310852051e+001},{"date":"2013-09-30","id_station":"ACO","id_parameter":"O3","media":2.353518104553223e+001},{"date":"2013-10-31","id_station":"ACO","id_parameter":"O3","media":2.625394248962402e+001},{"date":"2013-11-30","id_station":"ACO","id_parameter":"O3","media":2.548793601989746e+001},{"date":"2013-12-31","id_station":"ACO","id_parameter":"O3","media":2.698867034912109e+001},{"date":"2014-01-31","id_station":"ACO","id_parameter":"O3","media":3.104109191894531e+001},{"date":"2014-02-28","id_station":"ACO","id_parameter":"O3","media":3.699525070190430e+001},{"date":"2014-03-31","id_station":"ACO","id_parameter":"O3","media":2.900570106506348e+001},{"date":"2014-04-30","id_station":"ACO","id_parameter":"O3","media":4.005546188354492e+001},{"date":"2014-05-31","id_station":"ACO","id_parameter":"O3","media":3.726934814453125e+001},{"date":"2014-06-30","id_station":"ACO","id_parameter":"O3","media":2.614187812805176e+001},{"date":"2014-07-31","id_station":"ACO","id_parameter":"O3","media":2.584721183776856e+001},{"date":"2014-08-31","id_station":"ACO","id_parameter":"O3","media":2.763907051086426e+001},{"date":"2014-09-30","id_station":"ACO","id_parameter":"O3","media":2.314520835876465e+001},{"date":"2014-10-31","id_station":"ACO","id_parameter":"O3","media":2.381802749633789e+001},{"date":"2014-11-30","id_station":"ACO","id_parameter":"O3","media":2.467888832092285e+001},{"date":"2014-12-31","id_station":"ACO","id_parameter":"O3","media":2.448625946044922e+001},{"date":"2015-01-31","id_station":"ACO","id_parameter":"O3","media":2.855352592468262e+001},{"date":"2015-02-28","id_station":"ACO","id_parameter":"O3","media":3.027892684936523e+001},{"date":"2015-03-31","id_station":"ACO","id_parameter":"O3","media":3.071902465820313e+001},{"date":"2015-04-30","id_station":"ACO","id_parameter":"O3","media":3.951602935791016e+001},{"date":"2015-05-31","id_station":"ACO","id_parameter":"O3","media":3.343714904785156e+001},{"date":"2015-06-30","id_station":"ACO","id_parameter":"O3","media":2.926759719848633e+001},{"date":"2015-07-31","id_station":"ACO","id_parameter":"O3","media":2.979529762268066e+001},{"date":"2015-08-31","id_station":"ACO","id_parameter":"O3","media":3.102015876770020e+001},{"date":"2015-09-30","id_station":"ACO","id_parameter":"O3","media":2.797762489318848e+001},{"date":"2015-10-31","id_station":"ACO","id_parameter":"O3","media":2.797762489318848e+001},{"date":"2015-11-30","id_station":"ACO","id_parameter":"O3","media":2.797762489318848e+001},{"date":"2015-12-31","id_station":"ACO","id_parameter":"O3","media":2.797762489318848e+001},{"date":"2016-01-31","id_station":"ACO","id_parameter":"O3","media":3.007672309875488e+001},{"date":"2016-02-29","id_station":"ACO","id_parameter":"O3","media":3.007672309875488e+001},{"date":"2016-03-31","id_station":"ACO","id_parameter":"O3","media":3.695908737182617e+001},{"date":"2016-04-30","id_station":"ACO","id_parameter":"O3","media":4.146475601196289e+001},{"date":"2016-05-31","id_station":"ACO","id_parameter":"O3","media":4.327660369873047e+001},{"date":"2016-06-30","id_station":"ACO","id_parameter":"O3","media":3.316933059692383e+001},{"date":"2016-07-31","id_station":"ACO","id_parameter":"O3","media":2.902480125427246e+001},{"date":"2016-08-31","id_station":"ACO","id_parameter":"O3","media":2.740467643737793e+001},{"date":"2016-09-30","id_station":"ACO","id_parameter":"O3","media":2.764863586425781e+001},{"date":"2016-10-31","id_station":"ACO","id_parameter":"O3","media":3.007672309875488e+001},{"date":"2016-11-30","id_station":"ACO","id_parameter":"O3","media":2.222774314880371e+001},{"date":"2016-12-31","id_station":"ACO","id_parameter":"O3","media":2.179296112060547e+001},{"date":"2017-01-31","id_station":"ACO","id_parameter":"O3","media":2.833297538757324e+001},{"date":"2017-02-28","id_station":"ACO","id_parameter":"O3","media":3.509836578369141e+001},{"date":"2017-03-31","id_station":"ACO","id_parameter":"O3","media":3.334479141235352e+001},{"date":"2017-04-30","id_station":"ACO","id_parameter":"O3","media":4.071791458129883e+001},{"date":"2017-05-31","id_station":"ACO","id_parameter":"O3","media":4.348142623901367e+001},{"date":"2017-06-30","id_station":"ACO","id_parameter":"O3","media":3.122040939331055e+001},{"date":"2017-07-31","id_station":"ACO","id_parameter":"O3","media":2.329923629760742e+001},{"date":"2017-08-31","id_station":"ACO","id_parameter":"O3","media":2.637599563598633e+001},{"date":"2017-09-30","id_station":"ACO","id_parameter":"O3","media":2.275203132629395e+001},{"date":"2017-10-31","id_station":"ACO","id_parameter":"O3","media":2.729753875732422e+001},{"date":"2017-11-30","id_station":"ACO","id_parameter":"O3","media":2.550932312011719e+001},{"date":"2017-12-31","id_station":"ACO","id_parameter":"O3","media":1.733245277404785e+001},{"date":"2018-01-31","id_station":"ACO","id_parameter":"O3","media":1.244780826568604e+001},{"date":"2018-02-28","id_station":"ACO","id_parameter":"O3","media":2.032910156250000e+001},{"date":"2018-03-31","id_station":"ACO","id_parameter":"O3","media":2.962609672546387e+001},{"date":"2018-04-30","id_station":"ACO","id_parameter":"O3","media":3.139214897155762e+001},{"date":"2018-05-31","id_station":"ACO","id_parameter":"O3","media":3.104860115051270e+001},{"date":"2018-06-30","id_station":"ACO","id_parameter":"O3","media":2.597084045410156e+001},{"date":"2018-07-31","id_station":"ACO","id_parameter":"O3","media":2.905612182617188e+001},{"date":"2018-08-31","id_station":"ACO","id_parameter":"O3","media":2.460557365417481e+001},{"date":"2018-09-30","id_station":"ACO","id_parameter":"O3","media":2.356310081481934e+001},{"date":"2018-10-31","id_station":"ACO","id_parameter":"O3","media":2.719549179077148e+001},{"date":"2018-11-30","id_station":"ACO","id_parameter":"O3","media":2.359116554260254e+001},{"date":"2018-12-31","id_station":"ACO","id_parameter":"O3","media":2.522847747802734e+001},{"date":"2019-01-31","id_station":"ACO","id_parameter":"O3","media":2.670700645446777e+001},{"date":"2019-02-28","id_station":"ACO","id_parameter":"O3","media":2.621624946594238e+001},{"date":"2019-03-31","id_station":"ACO","id_parameter":"O3","media":3.022723960876465e+001},{"date":"2019-04-30","id_station":"ACO","id_parameter":"O3","media":3.533170318603516e+001},{"date":"2019-05-31","id_station":"ACO","id_parameter":"O3","media":3.524396514892578e+001},{"date":"2019-06-30","id_station":"ACO","id_parameter":"O3","media":2.770266151428223e+001},{"date":"2019-07-31","id_station":"ACO","id_parameter":"O3","media":3.135792732238770e+001},{"date":"2019-08-31","id_station":"ACO","id_parameter":"O3","media":3.135792732238770e+001},{"date":"2019-09-30","id_station":"ACO","id_parameter":"O3","media":2.764136886596680e+001},{"date":"2019-10-31","id_station":"ACO","id_parameter":"O3","media":2.142641448974609e+001},{"date":"2019-11-30","id_station":"ACO","id_parameter":"O3","media":2.686151695251465e+001},{"date":"2019-12-31","id_station":"ACO","id_parameter":"O3","media":3.135792732238770e+001},{"date":"2020-01-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-02-29","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-03-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-04-30","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-05-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-06-30","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-07-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-08-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-09-30","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-10-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-11-30","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001},{"date":"2020-12-31","id_station":"ACO","id_parameter":"O3","media":3.192372322082520e+001}]}';
+
+        var response3= 'php/contams_graphs.php';
+      //  let parsedResponse = ($.parseJSON(response3));
+
+     //  let stats = parsedResponse.stats;
+        $.getJSON(response3, function(datos){
+        let arrayDays = [];
+        $.each(datos.date, function(key, value) {
+            arrayDays.push(moment(value).toDate());
+        });
+
+        let statLength  = datos.length;
+        let occupation  = [];
+        let liveness    = [];
+        let efficiency  = [];
+        let labels      = [];
+
+        parsedResponse = undefined;
+
+        let dataDateTime        = '';
+        let dataDateTimeFormat  = 'YYYY MMM';
+        for(let index = 0; index < statLength; index++) {
+            dataDateTime = moment(datos[index]['date']).format(dataDateTimeFormat);
+
+            occupation.push(datos[index]['media']);
+           /* liveness.push(stats[index]['liveness']);
+            efficiency.push(stats[index]['efficiency']);*/
+            labels.push(dataDateTime);
+            console.log('media: '+occupation);  
+        }
+
+        let fill = false;
+        let color = Chart.helpers.color;
+        let data = {
+            labels: labels,
+            datasets: [{
+                label: 'Nivel de O3 ',
+                pointRadius: 0,
+                tension: 0,
+                backgroundColor: 'green',
+                borderColor: 'blue',
+                fill: fill,
+                data: occupation
+            }/*,{
+                label: 'Efficiency',
+                pointRadius: 0,
+                tension: 0,
+                backgroundColor: 'orange',
+                borderColor: 'orange',
+                fill: fill,
+                data: efficiency
+            },{
+                label: 'Screens',
+                pointRadius: 0,
+                tension: 0,
+                backgroundColor: 'blue',
+                borderColor: 'green',
+                fill: fill,
+                data: liveness
+            }*/]
+        };
+
+        let chartOptions = {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true,
+                        stepSize: 5,
+                        max: 50
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Puntos'
+                    }
+
+                }],
+                xAxes: [{
+					 	
+            	}]
+				},
+            tooltips: {
+                callbacks: {
+                    label: function(value, index) {
+                        return index.datasets[value.datasetIndex].label + ": " + value.yLabel;
+                    },
+                }
+            }
+        };
+		  var myChart = {}
+		  myChart.data = data;
+		  myChart.type = 'line';
+		  myChart.options = chartOptions;
+		  var ctx = document.getElementById("myChart");
+		  var myChart = new Chart(ctx, myChart)
+    });
+</script>
+
+ <script src="./bootstrap-4.4.1/js/bootstrap.min.js" charset="utf-8"></script>
+<script src="./bootstrap-4.4.1/jquery/jquery-3.4.1.js" charset="utf-8"></script> -->
+</body>
+<script>
+  document.getElementById("btnDownload").addEventListener('click', function(){  
+  var base64_url = document.getElementById("myChart").toDataURL("image/png");    
+  this.href = base64_url;
+});
+</script>
+</html>
+

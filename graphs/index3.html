@@ -1,0 +1,143 @@
+<htm>
+    <head>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+        <script type="text/javascript" src="//cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css"/>
+    </head>
+    <body>
+        <div class="margin-top-15">
+            <button id="submit">Consultar</button>
+            <canvas id="chart_elem" height="150"></canvas>                                   
+            <table id="example" class="display" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+    
+                                <th>fC.type</th>
+                                <th>f.type</th>
+                                <th>f.prop</th>
+                                <th>f.geom.type</th>
+                               
+                            </tr>
+                        </thead>
+    
+                    </table>
+        </div>
+        
+        <script>
+            $(document).ready(function () {
+           var asyncData;
+           $('#submit').on('click', function(){
+            
+            var table = $('#example').DataTable() ;
+            if(table){
+                table.destroy();
+            }
+            getdata();
+            
+           });
+           
+           function getdata(){
+               const getPeople = async () => {
+                const data = await fetch("php/contams_graphs.php?elem='o3'&start='2013-01-31'&end='2019-01-31'&estac='ACO'", {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',                                  
+                    }
+                });
+                
+                const jsondata = await data.json();
+                console.log(jsondata);
+                asyncData=jsondata.stats;
+
+                initialiseChart();
+                initialiseTable();
+                
+                return jsondata;
+               }; // del getPeople
+
+               getPeople();
+           }
+
+           function initialiseChart(){
+            var data= asyncData;
+            var length = data.length;
+            console.log("data in charts: "+ data.length);
+            var labels = [];
+            var values = [];
+            for (i = 0; i < data.length; i++) {
+                labels.push(data[i].date);
+                values.push(data[i].media);
+            }
+            console.log("labels: "+ labels[0]);
+            let fill = false;
+        //let color = Chart.helpers.color;
+        new Chart(document.getElementById("chart_elem"), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    //label: 'Nivel de '+elementoMayusc+' Estación '+estacMayusc,
+                    label: 'Nivel de '+'O3'+' Estación ACO',
+                    pointRadius: 0,
+                    tension: 0,
+                    backgroundColor: 'green',
+                    borderColor: 'blue',
+                    fill: fill,
+                    data: values
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero:true,
+                            max: Math.max(...values)+1
+                    
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Puntos'
+                        }
+
+                    }],
+                    xAxes: [{ }]
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(value, index) {
+                            return index.datasets[value.datasetIndex].label + ": " + value.yLabel;
+                        },
+                    }
+                }
+            }//Del Options
+        });//del chart
+
+    }// del initialize chart
+
+          function initialiseTable(){
+             var table = $("#example").DataTable({
+                 data: asyncData,
+                 columns: [
+                   {
+                      data: "date",
+                   },
+
+                   {
+                         data: "id_station",
+                     },
+                     {
+                         data: "id_parameter"
+                     },
+                     {
+                         data: "media"
+                     }
+                  ],
+                  //"bDestroy": true
+            });
+            console.log("data: "+table);
+         }
+        });
+        </script>
+    </body>
+</htm>
